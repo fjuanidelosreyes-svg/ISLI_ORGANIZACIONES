@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuesta — Escuelas y Empresas Asociadas · ISLI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:         #1a3a5c;
+    --azul-light:   #2a5a8c;
+    --azul-pale:    #e8f0f8;
+    --dorado:       #9a7b3a;
+    --dorado-light: #c4a45a;
+    --papel:        #f7f4ef;
+    --papel-dark:   #ede9e0;
+    --texto:        #1c1c1c;
+    --texto-suave:  #4a4a4a;
+    --borde:        #d4cfc4;
+    --borde-foco:   #2a5a8c;
+    --error:        #c0392b;
+    --r:            6px;
+    --font-serif:   'EB Garamond', Georgia, serif;
+    --font-sans:    'Inter', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--papel);
+    color: var(--texto);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER CON LOGO ── */
+  .site-header {
+    background: var(--azul);
+    color: #fff;
+    padding: 28px 24px 24px;
+    text-align: center;
+    border-bottom: 3px solid var(--dorado);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .header-logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+  }
+  .header-text { text-align: left; }
+  @media (max-width: 480px) {
+    .header-inner { flex-direction: column; gap: 12px; }
+    .header-text { text-align: center; }
+    .header-logo { width: 56px; height: 56px; }
+  }
+  .site-header .eyebrow {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--dorado-light);
+    margin-bottom: 8px;
+  }
+  .site-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 4vw, 28px);
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .site-header .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,.7);
+    margin-top: 6px;
+  }
+
+  /* ── INTRO ── */
+  .intro-card {
+    max-width: 720px;
+    margin: 28px auto 0;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--dorado);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    font-size: 14px;
+    color: var(--texto-suave);
+    line-height: 1.7;
+  }
+  .intro-card strong { color: var(--texto); }
+
+  /* ── PROGRESO ── */
+  .progress-wrap {
+    max-width: 720px;
+    margin: 20px auto 0;
+    padding: 0 16px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--texto-suave);
+    margin-bottom: 6px;
+  }
+  .progress-bar { height: 4px; background: var(--borde); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: var(--dorado);
+    border-radius: 2px;
+    transition: width .4s ease;
+    width: 0%;
+  }
+
+  /* ── FORM ── */
+  #survey-form {
+    max-width: 720px;
+    margin: 24px auto 60px;
+    padding: 0 16px;
+  }
+
+  /* ── SECCIÓN ── */
+  .section { display: none; animation: fadeIn .25s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .section-header {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--borde);
+  }
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--dorado);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(17px, 3vw, 22px);
+    font-weight: 500;
+    color: var(--azul);
+  }
+
+  /* ── Q BLOCK ── */
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: var(--r);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .q-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--texto);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .q-label .q-num { color: var(--dorado); font-weight: 600; margin-right: 4px; }
+  .q-hint { font-size: 12px; color: var(--texto-suave); margin-bottom: 10px; font-style: italic; }
+
+  /* ── TEXT INPUT ── */
+  .q-text-input {
+    width: 100%;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--texto);
+    background: var(--papel);
+    transition: border-color .15s, background .15s;
+  }
+  .q-text-input:focus { outline: none; border-color: var(--borde-foco); background: #fff; }
+
+  /* ── RADIO / CHECKBOX ── */
+  .options-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .opt-item label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: background .15s, border-color .15s;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .opt-item label:hover { background: var(--azul-pale); border-color: var(--borde-foco); }
+  .opt-item input[type="radio"],
+  .opt-item input[type="checkbox"] { margin-top: 2px; accent-color: var(--azul); flex-shrink: 0; width: 16px; height: 16px; }
+  .opt-item input:checked + span { color: var(--azul); font-weight: 500; }
+
+  /* ── OTRO ── */
+  .otro-input {
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    width: 100%;
+    margin-top: 6px;
+    background: var(--papel);
+    color: var(--texto);
+    display: none;
+  }
+  .otro-input:focus { outline: none; border-color: var(--borde-foco); background: #fff; }
+  .show-otro { display: block; }
+
+  /* ── MATRIX PILLS ── */
+  .matrix-wrap { display: flex; flex-direction: column; gap: 0; }
+  .matrix-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--papel-dark);
+  }
+  .matrix-row:last-child { border-bottom: none; }
+  .matrix-row-label {
+    flex: 1;
+    font-size: 13px;
+    color: var(--texto);
+    line-height: 1.4;
+    padding-right: 12px;
+    min-width: 0;
+  }
+  .matrix-pills { display: flex; gap: 6px; flex-shrink: 0; }
+  .matrix-pills input[type="radio"] { display: none; }
+  .matrix-pills label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--borde);
+    background: var(--papel);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+    text-align: center;
+    line-height: 1.2;
+    padding: 2px;
+  }
+  .matrix-pills label:hover { border-color: var(--azul-light); background: var(--azul-pale); color: var(--azul); }
+  .matrix-pills input[type="radio"]:checked + label {
+    background: var(--azul);
+    border-color: var(--azul);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(26,58,92,.25);
+  }
+
+  /* Colores semánticos por valor */
+  .matrix-pills label[data-val="E"]:hover  { border-color:#1a6b3a;color:#1a6b3a;background:#e5f4ec; }
+  .matrix-pills label[data-val="B"]:hover  { border-color:#27ae60;color:#27ae60;background:#edf8f2; }
+  .matrix-pills label[data-val="R"]:hover  { border-color:#e67e22;color:#e67e22;background:#fef5ec; }
+  .matrix-pills label[data-val="M"]:hover  { border-color:#c0392b;color:#c0392b;background:#fdf0ee; }
+  .matrix-pills input[data-val="E"]:checked + label { background:#1a6b3a;border-color:#1a6b3a; }
+  .matrix-pills input[data-val="B"]:checked + label { background:#27ae60;border-color:#27ae60; }
+  .matrix-pills input[data-val="R"]:checked + label { background:#e67e22;border-color:#e67e22; }
+  .matrix-pills input[data-val="M"]:checked + label { background:#c0392b;border-color:#c0392b; }
+
+  .matrix-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--borde);
+    font-style: italic;
+  }
+
+  /* Encabezados de pills para matrices EBMR */
+  .matrix-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 4px;
+    padding-right: 1px;
+  }
+  .matrix-header span {
+    width: 38px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+
+  @media (max-width: 520px) {
+    .matrix-pills label { width: 30px; height: 30px; font-size: 9px; }
+    .matrix-pills { gap: 4px; }
+    .matrix-header span { width: 30px; font-size: 9px; }
+    .matrix-row-label { font-size: 12px; }
+  }
+
+  /* ── NAVEGACIÓN ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    gap: 12px;
+  }
+  .btn {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 22px;
+    border-radius: var(--r);
+    border: none;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-prev { background: transparent; color: var(--texto-suave); border: 1px solid var(--borde); }
+  .btn-prev:hover { background: var(--papel-dark); }
+  .btn-next { background: var(--azul); color: #fff; margin-left: auto; }
+  .btn-next:hover { background: var(--azul-light); }
+  .btn-submit { background: var(--dorado); color: #fff; margin-left: auto; }
+  .btn-submit:hover { background: var(--dorado-light); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── ESTADO ENVÍO ── */
+  #submit-state { display: none; text-align: center; padding: 40px 20px; }
+  #submit-state.show { display: block; }
+  .submit-icon { font-size: 48px; margin-bottom: 16px; }
+  .submit-title { font-family: var(--font-serif); font-size: 24px; color: var(--azul); margin-bottom: 10px; }
+  .submit-msg { font-size: 14px; color: var(--texto-suave); max-width: 460px; margin: 0 auto; line-height: 1.7; }
+  .submit-error .submit-title { color: var(--error); }
+
+  .site-footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: var(--texto-suave);
+    border-top: 1px solid var(--borde);
+  }
+
+  @media (max-width: 480px) {
+    .q-block { padding: 14px; }
+    .nav-row { flex-wrap: wrap; }
+    .btn { width: 100%; text-align: center; }
+    .btn-next, .btn-submit { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <img src="data:image/png;base64,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" alt="Escudo ISLI" class="header-logo">
+    <div class="header-text">
+      <div class="eyebrow">Encuesta institucional</div>
+      <h1>Instituto Superior La Inmaculada</h1>
+      <div class="subtitle">Escuelas y Empresas Asociadas · Vinculación con el campo profesional</div>
+    </div>
+  </div>
+</header>
+
+<div class="intro-card">
+  Esta encuesta es parte de un proceso de mejora institucional del ISLI.<br><br>
+  Completarla lleva entre <strong>5 y 10 minutos</strong>. No hay respuestas correctas ni incorrectas: lo que más nos importa es su perspectiva sincera.<br><br>
+  Muchas gracias por su tiempo y colaboración.
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span id="progress-text">Sección 1 de 3</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<form id="survey-form" novalidate>
+
+  <!-- ═══════════════════════════════
+       SECCIÓN 0 — Identificación
+  ════════════════════════════════ -->
+  <div class="section active" id="s0" data-section="0">
+    <div class="section-header">
+      <div class="section-tag">Bloque inicial</div>
+      <div class="section-title">Identificación</div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Su nombre completo</div>
+      <input type="text" class="q-text-input" name="nombre" id="nombre" placeholder="Nombre y apellido" autocomplete="name">
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Nombre de la empresa u organización por la que responde</div>
+      <input type="text" class="q-text-input" name="organizacion" id="organizacion" placeholder="Nombre de la institución u organización">
+    </div>
+
+    <!-- Pregunta 1 -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">1.</span>¿Cuál es el sector o rubro principal de su empresa/organización?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q1" value="Educación"><span>Educación</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Gastronomía"><span>Gastronomía</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Hotelería o Eventos"><span>Hotelería o Eventos</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Comercio"><span>Comercio</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Empresa de Servicios"><span>Empresa de Servicios</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Industria"><span>Industria</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Sector Público"><span>Sector Público</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="Salud"><span>Salud</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1" value="ONG"><span>Organizaciones No Gubernamentales (ONG)</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q1_otro_r" value="otro"><span>Otro:</span></label>
+          <input type="text" class="otro-input" id="q1_otro" placeholder="Especificá el sector..." maxlength="200"></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 2 -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">2.</span>¿Hace cuánto tiempo su institución/empresa recibe practicantes, residentes o pasantes del Instituto La Inmaculada?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q2" value="Es nuestro primer año"><span>Es nuestro primer año recibiendo estudiantes de ISLI</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q2" value="Entre 1 y 3 años"><span>Entre 1 y 3 años</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q2" value="Entre 4 y 10 años"><span>Entre 4 y 10 años</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q2" value="Más de 10 años"><span>Hace más de 10 años que recibimos estudiantes de ISLI</span></label></li>
+      </ul>
+    </div>
+
+    <div class="nav-row">
+      <button type="button" class="btn btn-next" onclick="goNext()">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECCIÓN 1 — Desempeño
+  ════════════════════════════════ -->
+  <div class="section" id="s1" data-section="1">
+    <div class="section-header">
+      <div class="section-tag">Sección 1</div>
+      <div class="section-title">Desempeño y competencias de los estudiantes</div>
+    </div>
+
+    <!-- Pregunta 3 — radio simple con etiquetas descriptivas -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">3.</span>¿Cómo evalúa el nivel de preparación teórica y técnica con el que llegan los practicantes/pasantes del Instituto para enfrentar las tareas asignadas?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q3" value="Excelente"><span><strong>Excelente</strong> — Superan las expectativas del puesto</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q3" value="Bueno"><span><strong>Bueno</strong> — Están bien preparados para las tareas asignadas</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q3" value="Regular"><span><strong>Regular</strong> — Tienen base pero requieren mucha orientación inicial</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q3" value="Deficiente"><span><strong>Deficiente</strong> — La formación teórica y técnica es insuficiente para el puesto</span></label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 4a–4d — una por habilidad blanda -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">4a.</span>¿Cómo calificaría a los estudiantes de ISLI en cuanto a <strong>responsabilidad</strong>?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q4a" value="Muy buenos"><span><strong>Muy buenos</strong> — Destacan notablemente</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4a" value="Buenos"><span><strong>Buenos</strong> — Cumplen bien con lo esperado</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4a" value="Regular"><span><strong>Regular</strong> — Hay aspectos que mejorar</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4a" value="Malos"><span><strong>Malos</strong> — Es un área de debilidad evidente</span></label></li>
+      </ul>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">4b.</span>¿Cómo calificaría a los estudiantes de ISLI en cuanto a <strong>trabajo en equipo</strong>?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q4b" value="Muy buenos"><span><strong>Muy buenos</strong> — Destacan notablemente</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4b" value="Buenos"><span><strong>Buenos</strong> — Cumplen bien con lo esperado</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4b" value="Regular"><span><strong>Regular</strong> — Hay aspectos que mejorar</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4b" value="Malos"><span><strong>Malos</strong> — Es un área de debilidad evidente</span></label></li>
+      </ul>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">4c.</span>¿Cómo calificaría a los estudiantes de ISLI en cuanto a <strong>tolerancia a la presión</strong>?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q4c" value="Muy buenos"><span><strong>Muy buenos</strong> — Destacan notablemente</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4c" value="Buenos"><span><strong>Buenos</strong> — Cumplen bien con lo esperado</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4c" value="Regular"><span><strong>Regular</strong> — Hay aspectos que mejorar</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4c" value="Malos"><span><strong>Malos</strong> — Es un área de debilidad evidente</span></label></li>
+      </ul>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">4d.</span>¿Cómo calificaría a los estudiantes de ISLI en cuanto a <strong>puntualidad</strong>?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q4d" value="Muy buenos"><span><strong>Muy buenos</strong> — Destacan notablemente</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4d" value="Buenos"><span><strong>Buenos</strong> — Cumplen bien con lo esperado</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4d" value="Regular"><span><strong>Regular</strong> — Hay aspectos que mejorar</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q4d" value="Malos"><span><strong>Malos</strong> — Es un área de debilidad evidente</span></label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 5 — autonomía, radio descriptivo -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">5.</span>Pensando en los estudiantes de ISLI, ¿cómo cree que actuarían, en general, ante problemas, imprevistos y desafíos de la práctica cotidiana?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q5" value="Tienen autonomía"><span><strong>Tienen autonomía</strong> — Proponen soluciones o intentan resolverlo con las herramientas que tienen</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q5" value="Tienen iniciativa guiada"><span><strong>Tienen iniciativa guiada</strong> — Piden ayuda de inmediato, pero colaboran activamente en la solución</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q5" value="Les falta autonomía"><span><strong>Les falta autonomía</strong> — Se paralizan o esperan a que alguien más les diga exactamente qué hacer</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q5" value="Evitan el problema"><span><strong>Evitan el problema</strong> — Suelen evadir la situación o derivar la responsabilidad por completo</span></label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 6 — matriz EBMR con pills -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">6.</span>¿Cómo evalúa la formación que demostraron los estudiantes del ISLI en las siguientes esferas?</div>
+      <div class="q-hint">Seleccioná una opción por cada dimensión.</div>
+      <div class="matrix-header">
+        <span>Exc.</span><span>Bue.</span><span>Reg.</span><span>Mal.</span>
+      </div>
+      <div class="matrix-wrap" id="matrix-6"></div>
+      <div class="matrix-legend">
+        <span>Exc. = Excelente</span>
+        <span>Bue. = Bueno &nbsp; Reg. = Regular &nbsp; Mal. = Malo</span>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button type="button" class="btn btn-prev" onclick="goPrev()">← Anterior</button>
+      <button type="button" class="btn btn-next" onclick="goNext()">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECCIÓN 2 — Vínculo ISLI
+  ════════════════════════════════ -->
+  <div class="section" id="s2" data-section="2">
+    <div class="section-header">
+      <div class="section-tag">Sección 2</div>
+      <div class="section-title">Perfil del egresado y vínculo con el Instituto</div>
+    </div>
+
+    <!-- Pregunta 7 -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">7.</span>Teniendo en cuenta la realidad actual de su sector, ¿considera que el perfil del egresado de La Inmaculada responde a lo que las organizaciones buscan hoy al incorporar profesionales?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q7" value="Totalmente"><span><strong>Totalmente</strong> — El perfil está alineado con las demandas actuales del sector</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q7" value="Medianamente"><span><strong>Medianamente</strong> — Hay coincidencias importantes pero también brechas a mejorar</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q7" value="Poco"><span><strong>Poco</strong> — El perfil no termina de responder a lo que el sector necesita</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q7" value="No tengo elementos suficientes"><span>No tengo los elementos suficientes para evaluar el perfil general</span></label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 8 -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">8.</span>¿Cómo evalúa el acompañamiento del Instituto (profesores de prácticas o coordinadores) durante el tiempo que el alumno realiza su experiencia en su organización?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q8" value="Excelente"><span><strong>Excelente</strong> — Hay seguimiento constante, visitas y fluida comunicación con nosotros</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q8" value="Bueno"><span><strong>Bueno</strong> — Están presentes y disponibles si surge algún problema puntual</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q8" value="Regular"><span><strong>Regular</strong> — Poca comunicación, delegan casi toda la responsabilidad formativa en nosotros</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q8" value="Nulo"><span><strong>Nulo</strong> — Una vez que el estudiante ingresa, no tenemos contacto con los referentes del Instituto</span></label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 9 -->
+    <div class="q-block">
+      <div class="q-label"><span class="q-num">9.</span>Basado en su experiencia recibiendo a estos pasantes/residentes, ¿contrataría de forma permanente o recomendaría ampliamente a un egresado de esta institución?</div>
+      <ul class="options-list">
+        <li class="opt-item"><label><input type="radio" name="q9" value="Sí, definitivamente. Son mi primera opción"><span><strong>Sí, definitivamente.</strong> Son mi primera opción al buscar profesionales</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q9" value="Sí, en igualdad de condiciones"><span><strong>Sí</strong>, los consideraría en igualdad de condiciones frente a candidatos de otras instituciones</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q9" value="Solo si no encuentro otra opción"><span>Solo si no encuentro a alguien con experiencia o formado en otra institución</span></label></li>
+        <li class="opt-item"><label><input type="radio" name="q9" value="No, prefiero egresados de otras instituciones"><span><strong>No</strong>, prefiero priorizar a profesionales egresados de otras casas de estudio</span></label></li>
+      </ul>
+    </div>
+
+    <div class="nav-row">
+      <button type="button" class="btn btn-prev" onclick="goPrev()">← Anterior</button>
+      <button type="button" class="btn btn-submit" id="btn-enviar" onclick="submitForm()">Enviar respuestas ✓</button>
+    </div>
+  </div>
+
+  <!-- ESTADO ENVÍO -->
+  <div id="submit-state">
+    <div class="submit-icon" id="submit-icon">⏳</div>
+    <div class="submit-title" id="submit-title">Enviando...</div>
+    <div class="submit-msg" id="submit-msg">Estamos registrando sus respuestas. Por favor no cierre esta página.</div>
+  </div>
+
+</form>
+
+<footer class="site-footer">
+  Instituto Superior La Inmaculada · Encuesta a Escuelas y Empresas Asociadas · Respuestas confidenciales
+</footer>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2qMLtR1tlPSlvaO9vCqe8YkA9hmAd4oBPIURR6sqGMMe03L2lKDYkok4wTM1qS3FyGg/exec";
+
+// ── Navegación ──
+const TOTAL_SECTIONS = 3;
+let currentSection = 0;
+
+function updateProgress() {
+  const pct = Math.round((currentSection / (TOTAL_SECTIONS - 1)) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-text').textContent = `Sección ${currentSection + 1} de ${TOTAL_SECTIONS}`;
+}
+function goNext() {
+  document.getElementById('s' + currentSection).classList.remove('active');
+  currentSection++;
+  document.getElementById('s' + currentSection).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goPrev() {
+  document.getElementById('s' + currentSection).classList.remove('active');
+  currentSection--;
+  document.getElementById('s' + currentSection).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Otro ──
+document.addEventListener('change', function(e) {
+  const t = e.target;
+  if (t.type === 'radio' && t.name === 'q1_otro_r') {
+    document.getElementById('q1_otro').classList.toggle('show-otro', t.value === 'otro');
+  }
+});
+
+// ── Matrix EBMR pills ──
+function buildMatrixEBMR(containerId, rows) {
+  const vals = [
+    { v: 'E', label: 'Exc.' },
+    { v: 'B', label: 'Bue.' },
+    { v: 'R', label: 'Reg.' },
+    { v: 'M', label: 'Mal.' },
+  ];
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  rows.forEach(row => {
+    const div = document.createElement('div');
+    div.className = 'matrix-row';
+    div.innerHTML = `
+      <div class="matrix-row-label">${row.label}</div>
+      <div class="matrix-pills">
+        ${vals.map(({v, label}) => `
+          <input type="radio" name="${row.name}" id="${row.name}_${v}" value="${v}" data-val="${v}">
+          <label for="${row.name}_${v}" data-val="${v}">${label}</label>
+        `).join('')}
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+buildMatrixEBMR('matrix-6', [
+  { label: 'Aplicación práctica de sus conocimientos',                       name: 'q6_apl' },
+  { label: 'Uso de nuevas herramientas y tecnologías aplicadas al campo',     name: 'q6_tec' },
+  { label: 'Resolución de conflictos',                                        name: 'q6_res' },
+  { label: 'Toma rápida de decisiones bajo presión',                          name: 'q6_dec' },
+  { label: 'Habilidades de comunicación',                                     name: 'q6_com' },
+  { label: 'Liderazgo',                                                        name: 'q6_lid' },
+  { label: 'Trabajo en equipo',                                               name: 'q6_equ' },
+]);
+
+// ── Recolección de datos ──
+function collectData() {
+  const data = {};
+  const form = document.getElementById('survey-form');
+
+  data.timestamp    = new Date().toISOString();
+  data.nombre       = (form.querySelector('[name="nombre"]') || {}).value || '';
+  data.organizacion = (form.querySelector('[name="organizacion"]') || {}).value || '';
+
+  ['q1','q2','q3','q4a','q4b','q4c','q4d','q5','q7','q8','q9'].forEach(name => {
+    const sel = form.querySelector(`input[name="${name}"]:checked`);
+    data[name] = sel ? sel.value : '';
+  });
+
+  // Otro para q1
+  const q1otro = document.getElementById('q1_otro');
+  data.q1_otro = q1otro ? q1otro.value.trim() : '';
+
+  // Matriz 6
+  ['q6_apl','q6_tec','q6_res','q6_dec','q6_com','q6_lid','q6_equ'].forEach(name => {
+    const sel = form.querySelector(`input[name="${name}"]:checked`);
+    data[name] = sel ? sel.value : '';
+  });
+
+  return data;
+}
+
+// ── Envío ──
+async function submitForm() {
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  document.getElementById('survey-form').style.display = 'none';
+  document.getElementById('submit-state').classList.add('show');
+
+  const payload = collectData();
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('submit-icon').textContent = '✅';
+    document.getElementById('submit-title').textContent = '¡Muchas gracias!';
+    document.getElementById('submit-msg').textContent = 'Sus respuestas fueron registradas correctamente. Su opinión es fundamental para el crecimiento institucional del ISLI.';
+  } catch(err) {
+    document.getElementById('submit-icon').textContent = '❌';
+    document.getElementById('submit-state').classList.add('submit-error');
+    document.getElementById('submit-title').textContent = 'Hubo un problema al enviar';
+    document.getElementById('submit-msg').textContent = 'Por favor intentá de nuevo. Error: ' + err.message;
+    btn.disabled = false;
+  }
+}
+
+updateProgress();
+</script>
+</body>
+</html>
